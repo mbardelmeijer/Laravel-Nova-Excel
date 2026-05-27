@@ -2,7 +2,9 @@
 
 namespace Maatwebsite\LaravelNovaExcel\Actions;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -13,6 +15,7 @@ use Laravel\Nova\Http\Requests\ActionRequest;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
+use Laravel\Scout\Builder as ScoutBuilder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithHeadings as WithHeadingsConcern;
@@ -140,10 +143,7 @@ class ExportToExcel extends Action implements FromQuery, WithCustomChunkSize, Wi
         return $this;
     }
 
-    /**
-     * @return Builder
-     */
-    public function query()
+    public function query(): Builder|EloquentBuilder|Relation|ScoutBuilder
     {
         return $this->query;
     }
