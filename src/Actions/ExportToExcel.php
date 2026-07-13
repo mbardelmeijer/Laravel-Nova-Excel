@@ -15,7 +15,6 @@ use Laravel\Nova\Http\Requests\ActionRequest;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
-use Laravel\Scout\Builder as ScoutBuilder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithHeadings as WithHeadingsConcern;
@@ -32,6 +31,7 @@ use Maatwebsite\LaravelNovaExcel\Interactions\AskForFilename;
 use Maatwebsite\LaravelNovaExcel\Interactions\AskForWriterType;
 use Maatwebsite\LaravelNovaExcel\Requests\ExportActionRequest;
 use Maatwebsite\LaravelNovaExcel\Requests\ExportActionRequestFactory;
+use Maatwebsite\LaravelNovaExcel\Support\OptionalScout;
 
 class ExportToExcel extends Action implements FromQuery, WithCustomChunkSize, WithHeadingsConcern, WithMapping
 {
@@ -56,7 +56,7 @@ class ExportToExcel extends Action implements FromQuery, WithCustomChunkSize, Wi
     protected $request;
 
     /**
-     * @var Builder
+     * @var Builder|EloquentBuilder|Relation|\Laravel\Scout\Builder|null
      */
     protected $query;
 
@@ -143,7 +143,10 @@ class ExportToExcel extends Action implements FromQuery, WithCustomChunkSize, Wi
         return $this;
     }
 
-    public function query(): Builder|EloquentBuilder|Relation|ScoutBuilder
+    /**
+     * @return Builder|EloquentBuilder|Relation
+     */
+    public function query(): Builder|EloquentBuilder|Relation
     {
         return $this->query;
     }
@@ -194,12 +197,12 @@ class ExportToExcel extends Action implements FromQuery, WithCustomChunkSize, Wi
     }
 
     /**
-     * @param  Builder  $query
+     * @param  Builder|EloquentBuilder|Relation|\Laravel\Scout\Builder  $query
      * @return $this
      */
     protected function withQuery($query)
     {
-        $this->query = $query;
+        $this->query = OptionalScout::normalizeQuery($query);
 
         return $this;
     }
